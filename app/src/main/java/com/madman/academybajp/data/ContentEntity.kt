@@ -1,4 +1,5 @@
 package com.madman.academybajp.data
 
-class ContentEntity {
-}
+class ContentEntity(
+    var content: String
+)
