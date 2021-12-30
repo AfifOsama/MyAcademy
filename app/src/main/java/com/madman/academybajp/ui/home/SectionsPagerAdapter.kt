@@ -9,22 +9,26 @@ import com.madman.academybajp.R
 import com.madman.academybajp.ui.academy.AcademyFragment
 import com.madman.academybajp.ui.bookmark.BookmarkFragment
 
-class SectionsPagerAdapter(private val mContext: Context, fm:FragmentManager):FragmentPagerAdapter(fm,
-    BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+class SectionsPagerAdapter(private val mContext: Context, fm: FragmentManager) :
+    FragmentPagerAdapter(
+        fm,
+        BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
+    ) {
     override fun getCount(): Int = 2
 
     override fun getItem(position: Int): Fragment =
-        when(position){
+        when (position) {
             0 -> AcademyFragment()
             1 -> BookmarkFragment()
             else -> Fragment()
         }
 
     override fun getPageTitle(position: Int): CharSequence = mContext.resources.getString(
-        TAB_TITLES[position])
+        TAB_TITLES[position]
+    )
 
-    companion object{
+    companion object {
         @StringRes
-        private val TAB_TITLES= intArrayOf(R.string.home,R.string.bookmark)
+        private val TAB_TITLES = intArrayOf(R.string.home, R.string.bookmark)
     }
 }
