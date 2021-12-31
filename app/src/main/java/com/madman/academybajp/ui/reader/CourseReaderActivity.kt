@@ -2,6 +2,8 @@ package com.madman.academybajp.ui.reader
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.madman.academybajp.R
 import com.madman.academybajp.ui.reader.content.ModuleContentFragment
 import com.madman.academybajp.ui.reader.list.ModuleListFragment
@@ -10,10 +12,12 @@ class CourseReaderActivity : AppCompatActivity(), CourseReaderCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_course_reader)
+        val viewModel=ViewModelProvider(this,ViewModelProvider.NewInstanceFactory())[CourseReaderViewModel::class.java]
         val bundle = intent.extras
         if (bundle != null) {
             val courseId = bundle.getString(EXTRA_COURSE_ID)
             if (courseId != null) {
+                viewModel.selectedCourse(courseId)
                 populateFragment()
             }
         }
