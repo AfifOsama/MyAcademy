@@ -21,13 +21,13 @@ class AcademyAdapter : RecyclerView.Adapter<AcademyAdapter.ViewHolder>() {
         this.listCourses.addAll(courses)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AcademyAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemsAcademyBinding =
             ItemsAcademyBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(itemsAcademyBinding)
     }
 
-    override fun onBindViewHolder(holder: AcademyAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val course = listCourses[position]
         holder.bind(course)
     }
