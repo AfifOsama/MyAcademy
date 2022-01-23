@@ -5,6 +5,7 @@ import android.os.Looper
 import com.madman.academybajp.data.source.remote.response.ContentResponse
 import com.madman.academybajp.data.source.remote.response.CourseResponse
 import com.madman.academybajp.data.source.remote.response.ModuleResponse
+import com.madman.academybajp.utils.EspressoIdlingResource
 import com.madman.academybajp.utils.JsonHelper
 
 class RemoteDataSource private constructor(private val jsonHelper: JsonHelper) {
@@ -12,8 +13,12 @@ class RemoteDataSource private constructor(private val jsonHelper: JsonHelper) {
     private val handler = Handler(Looper.getMainLooper())
 
     fun getAllCourses(callback: LoadCoursesCallback) {
+        EspressoIdlingResource.increment()
         handler.postDelayed(
-            { callback.onAllCoursedReceived(jsonHelper.loadCourses()) },
+            {
+                callback.onAllCoursedReceived(jsonHelper.loadCourses())
+                EspressoIdlingResource.decrement()
+            },
             SERVICE_LATENCY_IN_MILLIS
         )
     }
@@ -23,8 +28,12 @@ class RemoteDataSource private constructor(private val jsonHelper: JsonHelper) {
     }
 
     fun getModules(courseId: String, callback: LoadModulesCallback) {
+        EspressoIdlingResource.increment()
         handler.postDelayed(
-            { callback.onAllModulesReceived(jsonHelper.loadModule(courseId)) },
+            {
+                callback.onAllModulesReceived(jsonHelper.loadModule(courseId))
+                EspressoIdlingResource.decrement()
+            },
             SERVICE_LATENCY_IN_MILLIS
         )
     }
@@ -34,8 +43,12 @@ class RemoteDataSource private constructor(private val jsonHelper: JsonHelper) {
     }
 
     fun getContent(moduleId: String, callback: LoadContentCallback) {
+        EspressoIdlingResource.increment()
         handler.postDelayed(
-            { callback.onContentReceived(jsonHelper.loadContent(moduleId)) },
+            {
+                callback.onContentReceived(jsonHelper.loadContent(moduleId))
+                EspressoIdlingResource.decrement()
+            },
             SERVICE_LATENCY_IN_MILLIS
         )
     }
