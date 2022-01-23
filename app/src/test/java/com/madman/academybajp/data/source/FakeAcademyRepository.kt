@@ -10,7 +10,7 @@ import com.madman.academybajp.data.source.remote.response.ContentResponse
 import com.madman.academybajp.data.source.remote.response.CourseResponse
 import com.madman.academybajp.data.source.remote.response.ModuleResponse
 
-class AcademyRepository private constructor(private val remoteDataSource: RemoteDataSource) :
+class FakeAcademyRepository(private val remoteDataSource: RemoteDataSource) :
     AcademyDataSource {
     override fun getAllCourses(): LiveData<List<CourseEntity>> {
         val courseResult = MutableLiveData<List<CourseEntity>>()
@@ -131,14 +131,6 @@ class AcademyRepository private constructor(private val remoteDataSource: Remote
         return moduleResult
     }
 
-    companion object {
-        @Volatile
-        private var instance: AcademyRepository? = null
 
-        fun getInstance(remoteDataSource: RemoteDataSource): AcademyRepository =
-            instance ?: synchronized(this) {
-                instance ?: AcademyRepository(remoteDataSource).apply { instance = this }
-            }
-    }
 
 }

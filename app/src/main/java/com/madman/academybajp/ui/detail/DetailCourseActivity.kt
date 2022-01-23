@@ -2,6 +2,7 @@ package com.madman.academybajp.ui.detail
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -14,6 +15,7 @@ import com.madman.academybajp.data.CourseEntity
 import com.madman.academybajp.databinding.ActivityDetailCourseBinding
 import com.madman.academybajp.databinding.ContentDetailCourseBinding
 import com.madman.academybajp.ui.reader.CourseReaderActivity
+import com.madman.academybajp.viewmodel.ViewModelFactory
 
 class DetailCourseActivity : AppCompatActivity() {
 
@@ -31,19 +33,30 @@ class DetailCourseActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val adapter = DetailCourseAdapter()
+        val factory = ViewModelFactory.getInstance(this)
         val viewModel = ViewModelProvider(
             this,
-            ViewModelProvider.NewInstanceFactory()
+            factory
         )[DetailCourseViewModel::class.java]
 
         val extras = intent.extras
         if (extras != null) {
             val courseId = extras.getString(EXTRA_COURSE)
             if (courseId != null) {
+
+                detailCourseBinding.progressBar.visibility = View.VISIBLE
+                detailCourseBinding.content.visibility = View.INVISIBLE
+
                 viewModel.selectedCourse(courseId)
-                val modules = viewModel.getModules()
-                adapter.setModules(modules)
-                populateCourse(viewModel.getCourse())
+                viewModel.getModules().observe(this, { modules ->
+                    detailCourseBinding.progressBar.visibility = View.GONE
+                    detailCourseBinding.content.visibility = View.VISIBLE
+
+                    adapter.setModules(modules)
+                    adapter.notifyDataSetChanged()
+                })
+                viewModel.getCourse().observe(this, { course -> populateCourse(course) })
+
             }
         }
 

@@ -16,6 +16,7 @@ class JsonHelper(private val context: Context) {
             `is`.read(buffer)
             `is`.close()
             String(buffer)
+
         } catch (ex: IOException) {
             ex.printStackTrace()
             null
@@ -25,7 +26,7 @@ class JsonHelper(private val context: Context) {
     fun loadCourses(): List<CourseResponse> {
         val list = ArrayList<CourseResponse>()
         try {
-            val responseObject = JSONObject(parsingFileToString("CourseResponse.json").toString())
+            val responseObject = JSONObject(parsingFileToString("CourseResponses.json").toString())
             val listArray = responseObject.getJSONArray("courses")
             for (i in 0 until listArray.length()) {
                 val course = listArray.getJSONObject(i)
@@ -42,6 +43,7 @@ class JsonHelper(private val context: Context) {
         } catch (e: JSONException) {
             e.printStackTrace()
         }
+
         return list
     }
 
@@ -54,15 +56,15 @@ class JsonHelper(private val context: Context) {
                 val responseObject = JSONObject(result)
                 val listArray = responseObject.getJSONArray("modules")
                 for (i in 0 until listArray.length()) {
-                    val module = listArray.getJSONObject(i)
+                    val course = listArray.getJSONObject(i)
 
-                    val moduleId = module.getString("moduleId")
-                    val title = module.getString("title")
-                    val position = module.getString("position")
+                    val moduleId = course.getString("moduleId")
+                    val title = course.getString("title")
+                    val position = course.getString("position")
 
-                    val moduleResponse =
+                    val courseResponse =
                         ModuleResponse(moduleId, courseId, title, Integer.parseInt(position))
-                    list.add(moduleResponse)
+                    list.add(courseResponse)
                 }
             }
         } catch (e: JSONException) {
@@ -80,7 +82,6 @@ class JsonHelper(private val context: Context) {
                 val responseObject = JSONObject(result)
                 val content = responseObject.getString("content")
                 contentResponse = ContentResponse(moduleId, content)
-
             }
         } catch (e: JSONException) {
             e.printStackTrace()

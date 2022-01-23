@@ -14,14 +14,14 @@ import com.madman.academybajp.databinding.FragmentModuleListBinding
 import com.madman.academybajp.ui.reader.CourseReaderActivity
 import com.madman.academybajp.ui.reader.CourseReaderCallback
 import com.madman.academybajp.ui.reader.CourseReaderViewModel
-import com.madman.academybajp.utils.DataDummy
+import com.madman.academybajp.viewmodel.ViewModelFactory
 
 class ModuleListFragment : Fragment(), MyAdapterClickListener {
 
     private lateinit var binding: FragmentModuleListBinding
     private lateinit var adapter: ModuleListAdapter
     private lateinit var courseReaderCallback: CourseReaderCallback
-    private lateinit var viewModel:CourseReaderViewModel
+    private lateinit var viewModel: CourseReaderViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,9 +34,14 @@ class ModuleListFragment : Fragment(), MyAdapterClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel=ViewModelProvider(requireActivity(),ViewModelProvider.NewInstanceFactory())[CourseReaderViewModel::class.java]
+        val factory = ViewModelFactory.getInstance(requireActivity())
+        viewModel = ViewModelProvider(requireActivity(), factory)[CourseReaderViewModel::class.java]
         adapter = ModuleListAdapter(this)
-        populateRecyclerView(viewModel.getModules())
+        binding.progressBar.visibility=View.VISIBLE
+        viewModel.getModules().observe(viewLifecycleOwner,{modules ->
+            binding.progressBar.visibility=View.GONE
+            populateRecyclerView(modules)
+        })
     }
 
     override fun onAttach(context: Context) {

@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.madman.academybajp.data.ContentEntity
 import com.madman.academybajp.data.ModuleEntity
 import com.madman.academybajp.databinding.FragmentModuleContentBinding
 import com.madman.academybajp.ui.reader.CourseReaderViewModel
+import com.madman.academybajp.viewmodel.ViewModelFactory
 
 class ModuleContentFragment : Fragment() {
     private lateinit var binding: FragmentModuleContentBinding
@@ -24,10 +24,17 @@ class ModuleContentFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (activity != null) {
+            val factory = ViewModelFactory.getInstance(requireActivity())
             //share viewmodel
-            val viewModel = ViewModelProvider(requireActivity(), ViewModelProvider.NewInstanceFactory())[CourseReaderViewModel::class.java]
-            val module = viewModel.getSelectedModule()
-            populateWebView(module)
+            val viewModel =
+                ViewModelProvider(requireActivity(), factory)[CourseReaderViewModel::class.java]
+            binding.progressBar.visibility = View.VISIBLE
+            viewModel.getSelectedModule().observe(viewLifecycleOwner, { module ->
+                binding.progressBar.visibility = View.GONE
+                if (module != null) {
+                    populateWebView(module)
+                }
+            })
         }
     }
 

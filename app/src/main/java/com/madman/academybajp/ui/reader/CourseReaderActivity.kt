@@ -7,12 +7,14 @@ import androidx.lifecycle.ViewModelProvider
 import com.madman.academybajp.R
 import com.madman.academybajp.ui.reader.content.ModuleContentFragment
 import com.madman.academybajp.ui.reader.list.ModuleListFragment
+import com.madman.academybajp.viewmodel.ViewModelFactory
 
 class CourseReaderActivity : AppCompatActivity(), CourseReaderCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_course_reader)
-        val viewModel=ViewModelProvider(this,ViewModelProvider.NewInstanceFactory())[CourseReaderViewModel::class.java]
+        val factory=ViewModelFactory.getInstance(this)
+        val viewModel=ViewModelProvider(this,factory)[CourseReaderViewModel::class.java]
         val bundle = intent.extras
         if (bundle != null) {
             val courseId = bundle.getString(EXTRA_COURSE_ID)
