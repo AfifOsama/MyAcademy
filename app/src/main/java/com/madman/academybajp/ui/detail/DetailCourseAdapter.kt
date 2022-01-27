@@ -3,7 +3,7 @@ package com.madman.academybajp.ui.detail
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.madman.academybajp.data.ModuleEntity
+import com.madman.academybajp.data.source.local.entity.ModuleEntity
 import com.madman.academybajp.databinding.ItemsModuleListBinding
 
 class DetailCourseAdapter : RecyclerView.Adapter<DetailCourseAdapter.ViewHolder>() {

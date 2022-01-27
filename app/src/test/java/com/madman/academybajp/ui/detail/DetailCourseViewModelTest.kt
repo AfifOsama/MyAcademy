@@ -3,8 +3,8 @@ package com.madman.academybajp.ui.detail
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.madman.academybajp.data.CourseEntity
-import com.madman.academybajp.data.ModuleEntity
+import com.madman.academybajp.data.source.local.entity.CourseEntity
+import com.madman.academybajp.data.source.local.entity.ModuleEntity
 import com.madman.academybajp.data.source.AcademyRepository
 import com.madman.academybajp.utils.DataDummy
 import org.junit.Assert.*

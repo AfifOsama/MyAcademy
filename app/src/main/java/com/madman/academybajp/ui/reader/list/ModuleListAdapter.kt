@@ -3,7 +3,7 @@ package com.madman.academybajp.ui.reader.list
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.madman.academybajp.data.ModuleEntity
+import com.madman.academybajp.data.source.local.entity.ModuleEntity
 import com.madman.academybajp.databinding.ItemsModuleListCustomBinding
 
 class ModuleListAdapter internal constructor(private val listener:MyAdapterClickListener):RecyclerView.Adapter<ModuleListAdapter.ViewHolder>() {
@@ -33,7 +33,7 @@ class ModuleListAdapter internal constructor(private val listener:MyAdapterClick
     override fun getItemCount(): Int = listModules.size
 
     inner class ViewHolder(private val binding:ItemsModuleListCustomBinding):RecyclerView.ViewHolder(binding.root) {
-        fun bind(module:ModuleEntity){
+        fun bind(module: ModuleEntity){
             binding.textModuleTitle.text=module.title
         }
     }

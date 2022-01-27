@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.madman.academybajp.data.ModuleEntity
+import com.madman.academybajp.data.source.local.entity.ModuleEntity
 import com.madman.academybajp.databinding.FragmentModuleContentBinding
 import com.madman.academybajp.ui.reader.CourseReaderViewModel
 import com.madman.academybajp.viewmodel.ViewModelFactory

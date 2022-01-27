@@ -1,8 +1,8 @@
 package com.madman.academybajp.data.source
 
 import androidx.lifecycle.LiveData
-import com.madman.academybajp.data.CourseEntity
-import com.madman.academybajp.data.ModuleEntity
+import com.madman.academybajp.data.source.local.entity.CourseEntity
+import com.madman.academybajp.data.source.local.entity.ModuleEntity
 
 interface AcademyDataSource {
     fun getAllCourses(): LiveData<List<CourseEntity>>

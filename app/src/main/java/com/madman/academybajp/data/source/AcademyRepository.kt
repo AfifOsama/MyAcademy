@@ -2,9 +2,9 @@ package com.madman.academybajp.data.source
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.madman.academybajp.data.ContentEntity
-import com.madman.academybajp.data.CourseEntity
-import com.madman.academybajp.data.ModuleEntity
+import com.madman.academybajp.data.source.local.entity.ContentEntity
+import com.madman.academybajp.data.source.local.entity.CourseEntity
+import com.madman.academybajp.data.source.local.entity.ModuleEntity
 import com.madman.academybajp.data.source.remote.RemoteDataSource
 import com.madman.academybajp.data.source.remote.response.ContentResponse
 import com.madman.academybajp.data.source.remote.response.CourseResponse

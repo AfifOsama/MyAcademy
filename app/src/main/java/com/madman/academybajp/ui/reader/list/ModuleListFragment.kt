@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.madman.academybajp.data.ModuleEntity
+import com.madman.academybajp.data.source.local.entity.ModuleEntity
 import com.madman.academybajp.databinding.FragmentModuleListBinding
 import com.madman.academybajp.ui.reader.CourseReaderActivity
 import com.madman.academybajp.ui.reader.CourseReaderCallback
