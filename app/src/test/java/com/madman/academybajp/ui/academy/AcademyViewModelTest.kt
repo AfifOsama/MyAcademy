@@ -6,6 +6,7 @@ import androidx.lifecycle.Observer
 import com.madman.academybajp.data.source.local.entity.CourseEntity
 import com.madman.academybajp.data.source.AcademyRepository
 import com.madman.academybajp.utils.DataDummy
+import com.madman.academybajp.vo.Resource
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
@@ -29,7 +30,7 @@ class AcademyViewModelTest {
     private lateinit var academyRepository: AcademyRepository
 
     @Mock
-    private lateinit var observer: Observer<List<CourseEntity>>
+    private lateinit var observer: Observer<Resource<List<CourseEntity>>>
 
     @Before
     fun setUp() {
@@ -39,11 +40,11 @@ class AcademyViewModelTest {
     @Test
     //Memastikan data course not null dan jumlah data course sesuai dengan yang diharapkan.
     fun getCourses() {
-        val dummyCourses = DataDummy.generateDummyCourses()
-        val courses = MutableLiveData<List<CourseEntity>>()
+        val dummyCourses = Resource.success(DataDummy.generateDummyCourses())
+        val courses = MutableLiveData<Resource<List<CourseEntity>>>()
         courses.value = dummyCourses
         `when`(academyRepository.getAllCourses()).then { courses }
-        val courseEntities = viewModel.getCourses().value
+        val courseEntities = viewModel.getCourses().value?.data
         //apakah metode getAllCourse akan terpanggil jika Anda memanggil viewModel.getCourses().
         verify<AcademyRepository>(academyRepository).getAllCourses()
         assertNotNull(courseEntities)

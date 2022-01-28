@@ -2,8 +2,12 @@ package com.madman.academybajp.ui.detail
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,47 +20,54 @@ import com.madman.academybajp.databinding.ActivityDetailCourseBinding
 import com.madman.academybajp.databinding.ContentDetailCourseBinding
 import com.madman.academybajp.ui.reader.CourseReaderActivity
 import com.madman.academybajp.viewmodel.ViewModelFactory
+import com.madman.academybajp.vo.Status
 
 class DetailCourseActivity : AppCompatActivity() {
 
     private lateinit var contentDetailBinding: ContentDetailCourseBinding
+    private lateinit var activityDetailCourseBinding: ActivityDetailCourseBinding
+    private lateinit var viewModel: DetailCourseViewModel
+    private var menu: Menu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val detailCourseBinding = ActivityDetailCourseBinding.inflate(layoutInflater)
-        contentDetailBinding = detailCourseBinding.detailContent
-        setContentView(detailCourseBinding.root)
+        activityDetailCourseBinding = ActivityDetailCourseBinding.inflate(layoutInflater)
+        contentDetailBinding = activityDetailCourseBinding.detailContent
+        setContentView(activityDetailCourseBinding.root)
 
-        setSupportActionBar(detailCourseBinding.toolbar)
+        setSupportActionBar(activityDetailCourseBinding.toolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val adapter = DetailCourseAdapter()
         val factory = ViewModelFactory.getInstance(this)
-        val viewModel = ViewModelProvider(
-            this,
-            factory
-        )[DetailCourseViewModel::class.java]
+        viewModel = ViewModelProvider(this, factory)[DetailCourseViewModel::class.java]
 
         val extras = intent.extras
         if (extras != null) {
             val courseId = extras.getString(EXTRA_COURSE)
             if (courseId != null) {
+                viewModel.setSelectedCourse(courseId)
 
-                detailCourseBinding.progressBar.visibility = View.VISIBLE
-                detailCourseBinding.content.visibility = View.INVISIBLE
-
-                viewModel.selectedCourse(courseId)
-                viewModel.getModules().observe(this, { modules ->
-                    detailCourseBinding.progressBar.visibility = View.GONE
-                    detailCourseBinding.content.visibility = View.VISIBLE
-
-                    adapter.setModules(modules)
-                    adapter.notifyDataSetChanged()
+                viewModel.courseModule.observe(this, { courseWithModuleResource ->
+                    if (courseWithModuleResource != null) {
+                        when (courseWithModuleResource.status) {
+                            Status.LOADING -> activityDetailCourseBinding.progressBar.visibility = View.VISIBLE
+                            Status.SUCCESS -> if (courseWithModuleResource.data != null) {
+                                activityDetailCourseBinding.progressBar.visibility = View.GONE
+                                activityDetailCourseBinding.content.visibility = View.VISIBLE
+                                adapter.setModules(courseWithModuleResource.data.mModules)
+                                adapter.notifyDataSetChanged()
+                                populateCourse(courseWithModuleResource.data.mCourse)
+                            }
+                            Status.ERROR -> {
+                                activityDetailCourseBinding.progressBar.visibility = View.GONE
+                                Toast.makeText(applicationContext, "Terjadi kesalahan", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
                 })
-                viewModel.getCourse().observe(this, { course -> populateCourse(course) })
-
             }
         }
 
@@ -68,6 +79,44 @@ class DetailCourseActivity : AppCompatActivity() {
             val dividerItemDecoration =
                 DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL)
             addItemDecoration(dividerItemDecoration)
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_detail, menu)
+        this.menu = menu
+        viewModel.courseModule.observe(this, { courseWithModule ->
+            if (courseWithModule != null) {
+                when (courseWithModule.status) {
+                    Status.LOADING -> activityDetailCourseBinding.progressBar.visibility = View.VISIBLE
+                    Status.SUCCESS -> if (courseWithModule.data != null) {
+                        activityDetailCourseBinding.progressBar.visibility = View.GONE
+                        val state = courseWithModule.data.mCourse.bookmarked
+                        setBookmarkState(state)
+                    }
+                    Status.ERROR -> {
+                        activityDetailCourseBinding.progressBar.visibility = View.GONE
+                        Toast.makeText(applicationContext, "Terjadi kesalahan", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
+        return true
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.action_bookmark) {
+            viewModel.setBookmark()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+    private fun setBookmarkState(state: Boolean) {
+        if (menu == null) return
+        val menuItem = menu?.findItem(R.id.action_bookmark)
+        if (state) {
+            menuItem?.icon = ContextCompat.getDrawable(this, R.drawable.ic_baseline_bookmark_24)
+        } else {
+            menuItem?.icon = ContextCompat.getDrawable(this, R.drawable.ic_baseline_bookmark_border_24)
         }
     }
 

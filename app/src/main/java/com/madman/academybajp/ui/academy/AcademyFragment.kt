@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.madman.academybajp.databinding.FragmentAcademyBinding
 import com.madman.academybajp.viewmodel.ViewModelFactory
+import com.madman.academybajp.vo.Status
 
 class AcademyFragment : Fragment() {
     private lateinit var binding: FragmentAcademyBinding
@@ -25,20 +27,28 @@ class AcademyFragment : Fragment() {
         if (activity != null) {
             val factory = ViewModelFactory.getInstance(requireActivity())
             val viewModel = ViewModelProvider(this, factory)[AcademyViewModel::class.java]
-            val courses = viewModel.getCourses()
+
             val academyAdapter = AcademyAdapter()
-
-            binding.progressBar.visibility = View.VISIBLE
-            viewModel.getCourses().observe(viewLifecycleOwner, {
-                binding.progressBar.visibility = View.GONE
-                academyAdapter.setCourses(it)
-                academyAdapter.notifyDataSetChanged()
+            viewModel.getCourses().observe(viewLifecycleOwner, { courses ->
+                if (courses != null) {
+                    when (courses.status) {
+                        Status.LOADING -> binding?.progressBar?.visibility = View.VISIBLE
+                        Status.SUCCESS -> {
+                            binding?.progressBar?.visibility = View.GONE
+                            academyAdapter.setCourses(courses.data)
+                            academyAdapter.notifyDataSetChanged()
+                        }
+                        Status.ERROR -> {
+                            binding?.progressBar?.visibility = View.GONE
+                            Toast.makeText(context, "Terjadi kesalahan", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
             })
-
-            with(binding.rvAcademy) {
-                layoutManager = LinearLayoutManager(context)
-                setHasFixedSize(true)
-                adapter = academyAdapter
+            with(binding?.rvAcademy) {
+                this?.layoutManager = LinearLayoutManager(context)
+                this?.setHasFixedSize(true)
+                this?.adapter = academyAdapter
             }
         }
     }

@@ -1,18 +1,35 @@
 package com.madman.academybajp.ui.detail
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.madman.academybajp.data.source.local.entity.CourseEntity
 import com.madman.academybajp.data.source.local.entity.ModuleEntity
 import com.madman.academybajp.data.source.AcademyRepository
+import com.madman.academybajp.data.source.local.entity.CourseWithModule
+import com.madman.academybajp.vo.Resource
 
 class DetailCourseViewModel(private val academyRepository: AcademyRepository) : ViewModel() {
-    private lateinit var courseId: String
+    val courseId = MutableLiveData<String>()
 
-    fun selectedCourse(courseId: String) {
-        this.courseId = courseId
+    fun setSelectedCourse(courseId: String) {
+        this.courseId.value = courseId
     }
 
-    fun getCourse(): LiveData<CourseEntity> = academyRepository.getCourseWithModules(courseId)
-    fun getModules(): LiveData<List<ModuleEntity>> = academyRepository.getAllModulesByCourse(courseId)
+    var courseModule: LiveData<Resource<CourseWithModule>> = Transformations.switchMap(courseId) { mCourseId ->
+        academyRepository.getCourseWithModules(mCourseId)
+    }
+
+    fun setBookmark() {
+        val moduleResource = courseModule.value
+        if (moduleResource != null) {
+            val courseWithModule = moduleResource.data
+            if (courseWithModule != null) {
+                val courseEntity = courseWithModule.mCourse
+                val newState = !courseEntity.bookmarked
+                academyRepository.setCourseBookmark(courseEntity, newState)
+            }
+        }
+    }
 }
