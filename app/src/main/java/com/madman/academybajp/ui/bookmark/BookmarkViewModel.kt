@@ -8,4 +8,9 @@ import com.madman.academybajp.data.source.AcademyRepository
 
 class BookmarkViewModel(private val academyRepository: AcademyRepository) : ViewModel() {
     fun getBookmarked(): LiveData<PagedList<CourseEntity>> = academyRepository.getBookmarkedCourses()
+
+    fun setBookmark(courseEntity: CourseEntity) {
+        val newState = !courseEntity.bookmarked
+        academyRepository.setCourseBookmark(courseEntity, newState)
+    }
 }
