@@ -1,8 +1,11 @@
 package com.madman.academybajp.ui.academy
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -11,7 +14,7 @@ import com.madman.academybajp.data.source.local.entity.CourseEntity
 import com.madman.academybajp.databinding.ItemsAcademyBinding
 import com.madman.academybajp.ui.detail.DetailCourseActivity
 
-class AcademyAdapter : RecyclerView.Adapter<AcademyAdapter.ViewHolder>() {
+class AcademyAdapter : PagedListAdapter<CourseEntity, AcademyAdapter.ViewHolder>(DIFF_CALLBACK) {
 
     private var listCourses = ArrayList<CourseEntity>()
 
@@ -52,6 +55,18 @@ class AcademyAdapter : RecyclerView.Adapter<AcademyAdapter.ViewHolder>() {
                     intent.putExtra(DetailCourseActivity.EXTRA_COURSE, course.courseId)
                     itemView.context.startActivity(intent)
                 }
+            }
+        }
+    }
+
+    companion object {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<CourseEntity>() {
+            override fun areItemsTheSame(oldItem: CourseEntity, newItem: CourseEntity): Boolean {
+                return oldItem.courseId == newItem.courseId
+            }
+            @SuppressLint("DiffUtilEquals")
+            override fun areContentsTheSame(oldItem: CourseEntity, newItem: CourseEntity): Boolean {
+                return oldItem == newItem
             }
         }
     }
