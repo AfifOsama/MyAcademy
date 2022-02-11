@@ -1,57 +1,90 @@
 package com.madman.academybajp.ui.reader.content
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.madman.academybajp.R
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.madman.academybajp.data.source.local.entity.ModuleEntity
+import com.madman.academybajp.databinding.FragmentModuleContentBinding
+import com.madman.academybajp.ui.reader.CourseReaderViewModel
+import com.madman.academybajp.viewmodel.ViewModelFactory
+import com.madman.academybajp.vo.Status
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ModuleContentFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ModuleContentFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var binding: FragmentModuleContentBinding
+    private lateinit var viewModel: CourseReaderViewModel
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentModuleContentBinding.inflate(layoutInflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (activity != null) {
+            val factory = ViewModelFactory.getInstance(requireActivity())
+            //share viewmodel
+            viewModel = ViewModelProvider(requireActivity(), factory)[CourseReaderViewModel::class.java]
+
+            viewModel.selectedModule.observe(viewLifecycleOwner, { moduleEntity ->
+                if (moduleEntity != null) {
+                    when (moduleEntity.status) {
+                        Status.LOADING -> binding?.progressBar?.visibility = View.VISIBLE
+                        Status.SUCCESS -> if (moduleEntity.data != null) {
+                            binding?.progressBar?.visibility = View.GONE
+                            if (moduleEntity.data.contentEntity != null) {
+                                populateWebView(moduleEntity.data)
+                            }
+                            setButtonNextPrevState(moduleEntity.data)
+                            if (!moduleEntity.data.read) {
+                                viewModel.readContent(moduleEntity.data)
+                            }
+                        }
+                        Status.ERROR -> {
+                            binding?.progressBar?.visibility = View.GONE
+                            Toast.makeText(context, "Terjadi kesalahan", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    binding?.btnNext?.setOnClickListener { viewModel.setNextPage() }
+                    binding?.btnPrev?.setOnClickListener { viewModel.setPrevPage() }
+                }
+            })
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_module_content, container, false)
+    private fun populateWebView(module: ModuleEntity) {
+        binding.webView.loadData(module.contentEntity?.content ?: "", "text/html", "UTF-8")
+
+    }
+
+    private fun setButtonNextPrevState(module: ModuleEntity) {
+        if (activity != null) {
+            when (module.position) {
+                0 -> {
+                    binding?.btnPrev?.isEnabled = false
+                    binding?.btnNext?.isEnabled = true
+                }
+                viewModel.getModuleSize() - 1 -> {
+                    binding?.btnPrev?.isEnabled = true
+                    binding?.btnNext?.isEnabled = false
+                }
+                else -> {
+                    binding?.btnPrev?.isEnabled = true
+                    binding?.btnNext?.isEnabled = true
+                }
+            }
+        }
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ModuleContentFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic fun newInstance(param1: String, param2: String) =
-                ModuleContentFragment().apply {
-                    arguments = Bundle().apply {
-                        putString(ARG_PARAM1, param1)
-                        putString(ARG_PARAM2, param2)
-                    }
-                }
+        val TAG: String = ModuleContentFragment::class.java.simpleName
+        fun newInstance(): ModuleContentFragment = ModuleContentFragment()
     }
 }
